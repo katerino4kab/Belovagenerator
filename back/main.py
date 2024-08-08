@@ -22,62 +22,18 @@ def init_db():
         conn.commit()
 
 
-# Маршрут для создания заметки
-@app.route('/todo', methods=['POST'])
-def create_todo():
-    text = request.json.get('text')
-    if not text:
-        return jsonify({'error': 'Text is required'}), 400
+def create_pic_pillow(pic, text):
+    pass
 
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute('INSERT INTO todo (text) VALUES (?)', (text,))
-        conn.commit()
-        todo_id = cursor.lastrowid
+
+# Маршрут для создания заметки
+@app.route('/createPic', methods=['POST'])
+def create_pic():
+    text = request.json.get('text')
+    
+    create_pic_pillow()
 
     return jsonify({'id': todo_id, 'text': text}), 201
-
-
-# Маршрут для редактирования текста заметки по id
-@app.route('/todo/<int:id>', methods=['PUT'])
-def update_todo(id):
-    text = request.json.get('text')
-    if not text:
-        return jsonify({'error': 'Text is required'}), 400
-
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute('UPDATE todo SET text = ? WHERE id = ?', (text, id))
-        conn.commit()
-        if cursor.rowcount == 0:
-            return jsonify({'error': 'Todo not found'}), 404
-
-    return jsonify({'id': id, 'text': text})
-
-
-# Маршрут для удаления заметки по id
-@app.route('/todo/<int:id>', methods=['DELETE'])
-def delete_todo(id):
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM todo WHERE id = ?', (id,))
-        conn.commit()
-        if cursor.rowcount == 0:
-            return jsonify({'error': 'Todo not found'}), 404
-
-    return jsonify({'message': 'Todo deleted'})
-
-
-# Маршрут для получения всех заметок
-@app.route('/todo', methods=['GET'])
-def get_all_todos():
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM todo')
-        todos = cursor.fetchall()
-        todos_list = [{'id': row['id'], 'text': row['text']} for row in todos]
-
-    return jsonify(todos_list)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,85 @@
+from telegram import Update, InputFile
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from PIL import Image, ImageDraw
+
+# Функция для открытки
+# Определяем размеры открыток
+CARD_SIZES = {
+    '1': (1280, 720),
+    '2': (720, 1280),
+    '3': (1024, 1024)
+}
+
+def create_postcard(photo: str, text: str):
+    image = Image.open(image)
+    draw = ImageDraw.Draw(image)
+
+    # шрифт и размер 
+    font = ImageFont.load_default()
+    text_size = draw.textsize(text, font=font)
+
+    # позиция текста
+    text_x = (image.width - text_size[!]) #спросить
+    text_y = image.height - text_size[!]
+
+    # текст на изображение 
+    draw.text((text_x, text_y), text, fill="white", font=font) 
+
+
+# /start 
+def start(): 
+    update.message.reply_text('Привет! Отправь мне фотографию и текст, и я сгенерирую тебе открытку!!!') 
+
+
+
+
+# Обработчик получения формата
+def format_handler():
+    user_input = update.message.text.strip()
+    if user_input in CARD_SIZES:
+        context.user_data['size'] = CARD_SIZES[user_input]
+        update.message.reply_text('Теперь отправь мне фотографию.')
+    else:
+        update.message.reply_text('Пожалуйста, выбери корректный номер формата.')
+
+# Сохраняем размер для открытки
+        context.user_data['photo'] = photo_bytes
+        update.message.reply_text('Теперь отправь мне текст для открытки.')
+    else:
+        update.message.reply_text('Сначала выбери формат открытки.')
+
+
+# получение фотографии и текста боту
+def photo_handler:
+    if update.message.photo:
+        photo_file = update.message.photo.get_file()
+
+        context.user_data['photo'] = photo_bytes
+        update.message.reply_text('текст для открытки.')
+
+        # Создаем открытку
+        postcard = create_postcard(photo_bytes, text)
+
+        # Отправляем готовую открытку
+        update.message.reply_photo(photo=InputFile(postcard, filename='postcard.png'))
+
+
+    # обработчики
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.photo, photo_handler))
+    dispatcher.add_handler(MessageHandler(Filters.text, Filters.command, text_handler))
+
+if __name__ == '__main__':
+    main()
+
+
+# доделывала на уроке
+def create_postcard(photo: bytes, text: str, size: tuple) -> io.BytesIO:
+    # Создаем холст нужного размера
+    canvas = Image.new('RGB', size, color='white')
+    draw = ImageDraw.Draw(canvas)
+
+    # Загружаем изображение из байтового потока
+    image = Image.open(io.BytesIO(photo))
+    image = image.resize((size[0], size[1] - 100))  # Оставляем место для текста
+    canvas.paste(image, (0, 0))  # Вставляем изображение на холст
